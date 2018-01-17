@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ascend.sbs.mapper.UserMapper">
+
+    <resultMap id="userMap" type="com.ascend.sbs.model.User">
+        <id property="userId" column="user_id" />
+        <result property="userName" column="user_name" />
+        <result property="password" column="password" />
+        <collection property="roles" ofType="com.ascend.sbs.model.Role">
+            <id property="roleId" column="role_id" />
+            <result property="roleName" column="role_name" />
+            <collection property="permissions" ofType="com.ascend.sbs.model.Permission">
+                <id property="permissionId" column="permission_id" />
+                <result property="permissionName" column="permission_name" />
+                <result property="url" column="url" />
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="findByUsername" parameterType="string" resultMap="userMap">
+        SELECT
+            u.*,
+            r.*,
+            p.*
+        FROM user u
+            INNER JOIN user_role ur ON u.user_id = ur.user_id
+            INNER JOIN role r ON ur.role_id = r.role_id
+            INNER JOIN role_permission rp ON r.role_id = rp.role_id
+            INNER JOIN permission p ON rp.permission_id = p.permission_id
+        WHERE u.user_name = #{username}
+    </select>
+</mapper>
